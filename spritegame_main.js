@@ -28,7 +28,7 @@ let potionDespawnAudio = new Audio('./audio/despawn.mp3');
 var gangnam = new Audio('./audio/secretSound.mp3');
 let currentTrack;
 
-let timer_start_value = 3;
+let timer_start_value = 30;
 let current_timer_value;
 let timer_element = document.getElementById("timer");
 let is_game_over = false;
