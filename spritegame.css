@@ -22,6 +22,16 @@
   }
 }
 
+@keyframes fadeOut {
+  69% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 html,
 body {
   margin: 0;
@@ -107,6 +117,10 @@ h1 {
   padding: 0.5em;
 }
 
+#currentPotion {
+  animation: fadeOut 5.5s;
+}
+
 #door {
   position: absolute;
   right: 178px;
@@ -169,4 +183,12 @@ h1 {
   bottom: 0px;
   /* which row of sprite */
   position: relative;
+}
+
+.secretClass {
+  width: 100vw;
+  height: 100vh;
+  background-image: url(img/superSecret.webp);
+  background-size: cover;
+  background-repeat: no-repeat;
 }

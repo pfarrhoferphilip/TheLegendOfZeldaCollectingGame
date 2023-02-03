@@ -10,6 +10,10 @@ let startButton = document.getElementById('startButton');
 let debug_output = document.getElementById('debug_output');
 
 let currentItem;
+let currentPotion = null;
+let potion_spawn_chance = 1000;
+let current_potion_spawn_chance = potion_spawn_chance;
+let potion_despawn_time = 5000;
 let score = 0;
 let scoreElement = document.getElementById("score");
 let musicVolume = 0.2;
@@ -19,9 +23,12 @@ var pickupAudio = new Audio('./audio/pickup.mp3');
 var musicTracks = [new Audio('./audio/Kass.mp3'), new Audio('./audio/Hateno.mp3'), new Audio('./audio/Revali.mp3')]
 var doorEnterAudio = new Audio('./audio/EnterDoor.wav');
 var gameStartAudio = new Audio('./audio/GameStart.mp3');
+let potionSpawnAudio = new Audio('./audio/spawn.mp3');
+let potionDespawnAudio = new Audio('./audio/despawn.mp3');
+var gangnam = new Audio('./audio/secretSound.mp3');
 let currentTrack;
 
-let timer_start_value = 30;
+let timer_start_value = 3;
 let current_timer_value;
 let timer_element = document.getElementById("timer");
 let is_game_over = false;
@@ -123,8 +130,6 @@ function startGame() {
 
 function gameLoop() {
 
-    console.log("frame");
-
     if (!is_game_over) {
         if (player.offsetLeft >= 5) {
             if (leftArrow) {
@@ -164,9 +169,28 @@ function gameLoop() {
             enterDoor();
         }
 
+        if (currentPotion != null) {
+            if (isColliding(player, currentPotion)) {
+                collectPotion();
+            }
+        }
+
         //DEVKEY
         if (fKey == true) {
             characterSpeed = 15;
+        }
+
+        //Spawn Potion at random
+        console.log(currentPotion);
+        if (door_is_entered) {
+            if (currentPotion == null) {
+                if (getRandomNumber(current_potion_spawn_chance + 2) == current_potion_spawn_chance) {
+                    spawnPotion(getRandomNumber(surface.clientWidth - 50), getRandomNumber(surface.clientHeight - 50));
+                    current_potion_spawn_chance = potion_spawn_chance;
+                } else if(current_potion_spawn_chance > 5){
+                    current_potion_spawn_chance -= 5;
+                }
+            }
         }
 
 
@@ -220,7 +244,7 @@ function gameOver() {
     is_game_over = true;
     surface.innerHTML += `
     <div id="gameOverScreen">
-        <h1 style="color: red;">GAME OVER</h1>
+        <h1 onclick="secretGangnamstyle()" style="color: red;">GAME OVER</h1>
         <div class="flex-center">
             <h1 id="restartButton" onclick="location.reload()">Restart</h1>
         </div>
@@ -243,6 +267,30 @@ function collectItem() {
 
 }
 
+function collectPotion() {
+    if (!is_game_over) {
+        currentPotion.remove();
+        currentPotion = null;
+        pickupAudio.pause;
+        pickupAudio.currentTime = 0;
+        pickupAudio.play();
+        speedBuff(15, 5000)
+    }
+
+}
+
+async function speedBuff(newSpeed, duration) {
+
+    characterSpeed = newSpeed;
+    setTimeout(function () {
+
+        characterSpeed = characterStartSpeed;
+
+    }, duration);
+
+}
+
+//Collectable Items
 function spawnItem(posX, posY) {
     console.log(posX + posY);
     document.getElementById("itemHolder").innerHTML = `
@@ -255,6 +303,33 @@ function spawnItem(posX, posY) {
 
     currentItem.style.right = posX + "px";
     currentItem.style.top = posY + "px";
+}
+
+//Potion Items
+function spawnPotion(posX, posY) {
+
+    console.log(posX + posY);
+    potionSpawnAudio.play();
+    document.getElementById("potionHolder").innerHTML = `
+    <div class="item" id="currentPotion">
+        <img src="img/speedPotion.png">
+    </div>
+    `
+    currentPotion = document.getElementById("currentPotion");
+    console.log(currentPotion);
+
+    currentPotion.style.right = posX + "px";
+    currentPotion.style.top = posY + "px";
+
+    setTimeout(function() {
+
+        if (currentPotion != null) {
+            currentPotion.remove();
+            potionDespawnAudio.play();
+            currentPotion = null;
+        }
+
+    }, potion_despawn_time)
 }
 
 function getRandomNumber(max) {
@@ -325,4 +400,9 @@ function animatePlayer() {
         spriteImgNumber = 0;
     }
 
+}
+
+function secretGangnamstyle() {
+    document.getElementById("body").outerHTML = '<body class="secretClass"></body>';
+    gangnam.play();
 }
