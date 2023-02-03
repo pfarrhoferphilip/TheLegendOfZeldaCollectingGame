@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sprite Game</title>
+	<link rel="stylesheet" href="./spritegame.css">
+	<script src="collisionDetection.js" defer></script>
+	<script src="./spritegame_main.js" defer></script>
+</head>
+
+<body id="body">
+
+	<div id="dashboard">
+		<div id="startButton" onclick="startGame()">START GAME</div>
+		<div id="debug_output"></div>
+	</div>
+
+	<div class="flex-center">
+		<h1 id="timer">TIMER</h1>
+		<h1 id="score">SCORE</h1>
+	</div>
+
+	<div id="surface">
+
+		<div id="player">
+			<img id="spriteImg" src="img/link.png" alt="sprite" />
+		</div>
+
+		<div id="door">
+
+		</div>
+
+		<div id="itemHolder">
+
+		</div>
+
+		<div id="blackPanel"></div>
+	</div>
+
+
+</body>
+
+</html>
