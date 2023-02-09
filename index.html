@@ -12,17 +12,17 @@
 
 <body id="body">
 
-	<div id="dashboard">
-		<div id="startButton" onclick="startGame()">START GAME</div>
-		<div id="debug_output"></div>
-	</div>
-
 	<div class="flex-center">
 		<h1 id="timer">TIMER</h1>
 		<h1 id="score">SCORE</h1>
 	</div>
 
 	<div id="surface">
+
+		<div id="dashboard">
+			<input placeholder="NAME" type="text" id="name">
+			<div id="startButton" onclick="startGame()">START</div>
+		</div>
 
 		<div id="player">
 			<img id="spriteImg" src="img/link.png" alt="sprite" />
@@ -41,6 +41,7 @@
 		</div>
 
 		<div id="blackPanel"></div>
+
 	</div>
 
 

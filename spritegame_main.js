@@ -6,8 +6,8 @@ let door = document.getElementById('door');
 let spriteImg = document.getElementById('spriteImg');
 let surface = document.getElementById('surface');
 
+let dashboard = document.getElementById("dashboard");
 let startButton = document.getElementById('startButton');
-let debug_output = document.getElementById('debug_output');
 
 let currentItem;
 let currentPotion = null;
@@ -33,6 +33,11 @@ let current_timer_value;
 let timer_element = document.getElementById("timer");
 let is_game_over = false;
 let door_is_entered = false;
+
+let leaderboard = [];
+let leaderboard_sorted = [];
+let user_name = "";
+let try_id;
 
 
 
@@ -83,10 +88,6 @@ function keydown_detected(e) {
     if (e.keyCode == 40) { // downArrow
         downArrow = true;
     }
-    //Only for development purposes
-    if (e.keyCode == 70) { // F
-        fKey = true;
-    }
 }
 function keyup_detected(e) {
     //console.log(e);
@@ -114,18 +115,25 @@ function keyup_detected(e) {
  * GAME LOOP
  * **********************************/
 function startGame() {
-    scoreElement.innerHTML = score;
-    player.style.left = '290px'; // starting position
-    player.style.top = '180px'; // starting position
-    player.style.opacity = '1'; // show player
-    spriteImg.style.right = '0px'; // starting animation
+    if (document.getElementById("name").value != "") {
 
-    startButton.innerHTML = 'STARTED';
-    startButton.removeAttribute('onclick');
-    gameStartAudio.play();
+        scoreElement.innerHTML = score;
+        player.style.left = '290px'; // starting position
+        player.style.top = '180px'; // starting position
+        player.style.opacity = '1'; // show player
+        spriteImg.style.right = '0px'; // starting animation
 
-    startMusic();
-    gameLoop();
+        user_name = document.getElementById("name").value;
+
+        dashboard.remove();
+        gameStartAudio.play();
+
+        startMusic();
+        gameLoop();
+
+    } else {
+        alert("Please Enter a Name!");
+    }
 }
 
 function gameLoop() {
@@ -175,19 +183,13 @@ function gameLoop() {
             }
         }
 
-        //DEVKEY
-        if (fKey == true) {
-            characterSpeed = 15;
-        }
-
         //Spawn Potion at random
-        console.log(currentPotion);
         if (door_is_entered) {
             if (currentPotion == null) {
                 if (getRandomNumber(current_potion_spawn_chance + 2) == current_potion_spawn_chance) {
                     spawnPotion(getRandomNumber(surface.clientWidth - 50), getRandomNumber(surface.clientHeight - 50));
                     current_potion_spawn_chance = potion_spawn_chance;
-                } else if(current_potion_spawn_chance > 5){
+                } else if (current_potion_spawn_chance > 5) {
                     current_potion_spawn_chance -= 5;
                 }
             }
@@ -241,10 +243,13 @@ async function countTimerDown() {
 }
 
 function gameOver() {
+    //STUFF
+    potionDespawnAudio.play();
     is_game_over = true;
     surface.innerHTML += `
     <div id="gameOverScreen">
         <h1 onclick="secretGangnamstyle()" style="color: red;">GAME OVER</h1>
+        <h2 style="text-align: center;">Score: ${score}</h2>
         <div class="flex-center">
             <h1 id="restartButton" onclick="location.reload()">Restart</h1>
         </div>
@@ -252,6 +257,51 @@ function gameOver() {
     `;
     player.opacity = 0;
     currentItem.opacity = 0;
+
+
+    //LOCAL STORAGE
+    if ((localStorage['leaderboard'])) {
+        leaderboard = JSON.parse(localStorage['leaderboard']);
+    }
+
+    if ((localStorage['try_id'])) {
+        try_id = JSON.parse(localStorage['try_id']);
+        try_id++;
+        localStorage['try_id'] = JSON.stringify(try_id);
+    } else {
+        localStorage['try_id'] = JSON.stringify(0);
+    }
+
+    let currentTry = {
+        name: user_name,
+        score: score,
+        try_id: localStorage['try_id']
+    }
+
+    leaderboard.push(currentTry);
+
+    localStorage['leaderboard'] = JSON.stringify(leaderboard);
+
+    for (let i = 0; i < leaderboard.length; i++) {
+        let leaderboard_placing = 0;
+
+        for (let j = 0; j < leaderboard.length; j++) {
+
+            if (leaderboard[i].score < leaderboard[j].score) {
+                leaderboard_placing += 1;
+            } else if (leaderboard[i].score == leaderboard[j].score) {
+                if (i < j) {
+                    leaderboard_placing++;
+                }
+            }
+
+        }
+
+        leaderboard_sorted[leaderboard_placing] = leaderboard[i];
+    }
+
+    localStorage['leaderboard_sorted'] = JSON.stringify(leaderboard_sorted);
+    window.open("leaderboard.html", "_blank");
 }
 
 function collectItem() {
@@ -321,7 +371,7 @@ function spawnPotion(posX, posY) {
     currentPotion.style.right = posX + "px";
     currentPotion.style.top = posY + "px";
 
-    setTimeout(function() {
+    setTimeout(function () {
 
         if (currentPotion != null) {
             currentPotion.remove();
@@ -367,9 +417,6 @@ function movePlayer(dx, dy, dr) {
         if (dr != 0) {
             player.style.transform = `scaleX(${-dr})`;
         }
-
-        // output in debugger box
-        debug_output.innerHTML = `x: ${x} | y: ${y} | direction: ${dr} | animation: ${spriteImgNumber}`;
     }
 
 
