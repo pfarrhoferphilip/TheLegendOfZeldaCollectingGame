@@ -22,6 +22,20 @@
   }
 }
 
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
 @keyframes fadeOut {
   69% {
     opacity: 1;
@@ -32,8 +46,34 @@
   }
 }
 
+@keyframes growIn {
+  0% {
+    transform: scale(0%);
+  }
+
+  100% {
+    transform: scale(100%);
+  }
+}
+
+@keyframes letterFadeIn {
+  0% {
+    letter-spacing: -15px;
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    letter-spacing: 1px;
+  }
+}
+
 html,
 body {
+  letter-spacing: 1px;
   overflow: hidden;
   width: 100vw;
   height: 100vh;
@@ -78,6 +118,8 @@ td {
 }
 
 .flex-center {
+  margin-top: 1%;
+  margin-bottom: 0%;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -120,13 +162,23 @@ td {
 /* dashboard outputs */
 #dashboard {
   width: 100%;
-  height: 100%;
+  height: 50%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: start;
   width: 100%;
   margin: 0 auto;
   padding: 1em 0;
+  animation: fadeIn 2s ease-in-out;
+}
+
+#title {
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  width: 100%;
+  height: 50%;
+  animation: letterFadeIn 1s ease-in-out;
 }
 
 #name {
@@ -140,10 +192,10 @@ td {
   color: #fff;
   width: 10%;
   font-size: small;
-  height: 4%;
+  height: 8%;
   background-color: #222;
   border: 3px solid rgb(0, 0, 0);
-  
+
   text-align: center;
 }
 
@@ -161,6 +213,10 @@ td {
 
 #currentPotion {
   animation: fadeOut 5.5s;
+}
+
+#currentItem {
+  animation: growIn 0.2s ease-in-out;
 }
 
 #door {

@@ -39,6 +39,7 @@ let leaderboard_sorted = [];
 let user_name = "";
 let try_id;
 
+let playerOffsets = [5, (surface.clientWidth - 50), 0, (surface.clientHeight - 53)];
 
 
 // Scale the surface to 80% of the screen width
@@ -126,10 +127,13 @@ function startGame() {
         user_name = document.getElementById("name").value;
 
         dashboard.remove();
+        document.getElementById("title").remove();
         gameStartAudio.play();
+        timer_element.innerHTML = timer_start_value;
 
-        startMusic();
+
         gameLoop();
+        startMusic();
 
     } else {
         alert("Please Enter a Name!");
@@ -139,28 +143,28 @@ function startGame() {
 function gameLoop() {
 
     if (!is_game_over) {
-        if (player.offsetLeft >= 5) {
+        if (player.offsetLeft >= playerOffsets[0]) {
             if (leftArrow) {
                 movePlayer((-1) * characterSpeed, 0, -1);
                 animatePlayer();
             }
         }
 
-        if (player.offsetLeft <= surface.clientWidth - 50) {
+        if (player.offsetLeft <= playerOffsets[1]) {
             if (rightArrow) {
                 movePlayer(characterSpeed, 0, 1)
                 animatePlayer();
             }
         }
 
-        if (player.offsetTop >= 0) {
+        if (player.offsetTop >= playerOffsets[2]) {
             if (upArrow) {
                 movePlayer(0, (-1) * characterSpeed, 0);
                 animatePlayer();
             }
         }
 
-        if (player.offsetTop <= surface.clientHeight - 53) {
+        if (player.offsetTop <= playerOffsets[3]) {
             if (downArrow) {
                 movePlayer(0, characterSpeed, 0);
                 animatePlayer();
@@ -186,8 +190,8 @@ function gameLoop() {
         //Spawn Potion at random
         if (door_is_entered) {
             if (currentPotion == null) {
-                if (getRandomNumber(current_potion_spawn_chance + 2) == current_potion_spawn_chance) {
-                    spawnPotion(getRandomNumber(surface.clientWidth - 50), getRandomNumber(surface.clientHeight - 50));
+                if (getRandomNumber(current_potion_spawn_chance + 2, 0) == current_potion_spawn_chance) {
+                    spawnPotion(getRandomNumber(playerOffsets[1], playerOffsets[0]), getRandomNumber(playerOffsets[2], playerOffsets[3]));
                     current_potion_spawn_chance = potion_spawn_chance;
                 } else if (current_potion_spawn_chance > 5) {
                     current_potion_spawn_chance -= 5;
@@ -202,6 +206,10 @@ function gameLoop() {
 
 async function enterDoor() {
     if (!door_is_entered) {
+
+        //REAJUST WALLS
+        playerOffsets = [100, (surface.clientWidth - 145), 75, (surface.clientHeight - 53)];
+
         door_is_entered = true;
         characterSpeed = 0;
         door.remove();
@@ -219,7 +227,7 @@ async function enterDoor() {
                 console.log("timeout 2");
                 document.getElementById("blackPanel").remove();
 
-                spawnItem(getRandomNumber(surface.clientWidth - 50), getRandomNumber(surface.clientHeight - 50));
+                spawnItem(getRandomNumber(playerOffsets[1], playerOffsets[0]), getRandomNumber(playerOffsets[2], playerOffsets[3]));
                 current_timer_value = timer_start_value;
                 characterSpeed = characterStartSpeed;
                 countTimerDown();
@@ -301,7 +309,9 @@ function gameOver() {
     }
 
     localStorage['leaderboard_sorted'] = JSON.stringify(leaderboard_sorted);
-    window.open("leaderboard.html", "_blank");
+    setTimeout(function () {
+        window.open("leaderboard.html", "_blank");
+    }, 1000);
 }
 
 function collectItem() {
@@ -312,7 +322,7 @@ function collectItem() {
         currentItem.remove();
         score++;
         scoreElement.innerHTML = score;
-        spawnItem(getRandomNumber(surface.clientWidth - 50), getRandomNumber(surface.clientHeight - 50));
+        spawnItem(getRandomNumber(playerOffsets[0], playerOffsets[1]), getRandomNumber(playerOffsets[2], playerOffsets[3]));
     }
 
 }
@@ -382,8 +392,8 @@ function spawnPotion(posX, posY) {
     }, potion_despawn_time)
 }
 
-function getRandomNumber(max) {
-    let randomNum = Math.floor(Math.random() * max);
+function getRandomNumber(max, min) {
+    let randomNum = Math.floor((Math.random() * (max - min)) + min);
     console.log(randomNum);
     return randomNum;
 }
